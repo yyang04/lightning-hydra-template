@@ -17,25 +17,21 @@ tags: ["mnist", "simple_dense_net"]
 seed: 12345
 
 trainer:
-  min_epochs: 10
+  min_epochs: 1
   max_epochs: 10
   gradient_clip_val: 0.5
+  accelerator: gpu
 
 model:
   optimizer:
     lr: 0.002
   net:
-    lin1_size: 128
-    lin2_size: 256
+    lin1_size: 64
+    lin2_size: 128
     lin3_size: 64
-  compile: false
+  compile: True
 
 data:
-  batch_size: 64
-
-logger:
-  wandb:
-    tags: ${tags}
-    group: "mnist"
-  aim:
-    experiment: "mnist"
+  batch_size: 128
+  num_workers: 2
+  pin_memory: True

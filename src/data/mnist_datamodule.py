@@ -59,6 +59,7 @@ class MNISTDataModule(LightningDataModule):
         batch_size: int = 64,
         num_workers: int = 0,
         pin_memory: bool = False,
+        persistent_workers: bool = False,
     ) -> None:
         """Initialize a `MNISTDataModule`.
 
@@ -143,6 +144,7 @@ class MNISTDataModule(LightningDataModule):
             batch_size=self.batch_size_per_device,
             num_workers=self.hparams.num_workers,
             pin_memory=self.hparams.pin_memory,
+            persistent_workers=self.hparams.persistent_workers,
             shuffle=True,
         )
 
@@ -156,6 +158,7 @@ class MNISTDataModule(LightningDataModule):
             batch_size=self.batch_size_per_device,
             num_workers=self.hparams.num_workers,
             pin_memory=self.hparams.pin_memory,
+            persistent_workers=self.hparams.persistent_workers,
             shuffle=False,
         )
 
@@ -169,6 +172,7 @@ class MNISTDataModule(LightningDataModule):
             batch_size=self.batch_size_per_device,
             num_workers=self.hparams.num_workers,
             pin_memory=self.hparams.pin_memory,
+            persistent_workers=self.hparams.persistent_workers,
             shuffle=False,
         )
 

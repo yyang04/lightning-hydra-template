@@ -1,0 +1,9 @@
+# https://docs.swanlab.cn/guide_cloud/integration/integration-pytorch-lightning.html
+
+swanlab:
+  _target_: swanlab.integration.pytorch_lightning.SwanLabLogger
+  project: "lightning-hydra-template"
+  workspace: null
+  experiment_name: null
+  save_dir: "${paths.output_dir}"
+  tags: []
