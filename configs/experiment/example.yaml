@@ -29,9 +29,10 @@ model:
     lin1_size: 64
     lin2_size: 128
     lin3_size: 64
-  compile: True
+  compile: False
 
 data:
   batch_size: 128
   num_workers: 2
   pin_memory: True
+  persistent_workers: True

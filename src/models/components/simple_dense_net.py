@@ -14,7 +14,6 @@ class SimpleDenseNet(nn.Module):
         output_size: int = 10,
     ) -> None:
         """Initialize a `SimpleDenseNet` module.
-
         :param input_size: The number of input features.
         :param lin1_size: The number of output features of the first linear layer.
         :param lin2_size: The number of output features of the second linear layer.

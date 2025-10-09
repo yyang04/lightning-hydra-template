@@ -1,0 +1,34 @@
+data:
+  data_dir: "./data"
+
+version: "v0"
+
+features:
+  discrete_features:
+    - "user_id"
+    - "category"
+    - "city"
+
+  continuous_features:
+    - "age"
+    - "price"
+    - "income"
+
+  discrete_sequence_features:
+    - "click_history"
+    - "search_history"
+
+  continuous_sequence_features: null
+
+processing:
+  discrete:
+    handle_unknown: "ignore"
+    fillna_value: 0
+
+  continuous:
+    scaler: "standard"  # standard, minmax, robust
+    fillna_strategy: "mean"  # mean, median, zero
+
+  sequences:
+    max_sequence_length: 50
+    padding_value: 0
