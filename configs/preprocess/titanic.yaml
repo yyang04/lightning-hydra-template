@@ -4,21 +4,21 @@ data:
 version: "v0"
 
 features:
-  discrete_features:
+  discrete:
     - "user_id"
     - "category"
     - "city"
 
-  continuous_features:
+  continuous:
     - "age"
     - "price"
     - "income"
 
-  discrete_sequence_features:
+  discrete_sequence:
     - "click_history"
     - "search_history"
 
-  continuous_sequence_features: null
+  continuous_sequence: null
 
 processing:
   discrete:
@@ -29,6 +29,11 @@ processing:
     scaler: "standard"  # standard, minmax, robust
     fillna_strategy: "mean"  # mean, median, zero
 
-  sequences:
+  discrete_sequence:
     max_sequence_length: 50
     padding_value: 0
+
+  continuous_sequence:
+    max_sequence_length: 50
+    padding_value: 0.
+

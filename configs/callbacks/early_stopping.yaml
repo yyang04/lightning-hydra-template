@@ -2,7 +2,7 @@
 
 early_stopping:
   _target_: lightning.pytorch.callbacks.EarlyStopping
-  monitor: null # name of the logged metric which determines when model is improving
+  monitor: null # name of the logged metric which determines when the model is improving
   min_delta: 0. # minimum change in the monitored quantity to qualify as an improvement
   patience: 3 # number of checks with no improvement after which training will be stopped
   verbose: False # verbosity mode
@@ -12,4 +12,4 @@ early_stopping:
   stopping_threshold: null # stop training immediately once the monitored quantity reaches this threshold
   divergence_threshold: null # stop training as soon as the monitored quantity becomes worse than this threshold
   check_on_train_epoch_end: null # whether to run early stopping at the end of the training epoch
-  # log_rank_zero_only: False  # this keyword argument isn't available in stable version
+  # log_rank_zero_only: False #, this keyword argument isn't available in a stable version

@@ -2,14 +2,20 @@ import hydra
 from omegaconf import DictConfig, OmegaConf
 import pandas as pd
 import numpy as np
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OrdinalEncoder
+import joblib
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler
 from typing import Dict, List, Any, Optional
 import json
 from pathlib import Path
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class HydraDataPreprocessor:
-    """基于 Hydra 配置的数据预处理器"""
 
     def __init__(self, cfg: DictConfig):
         self.cfg = cfg
@@ -96,10 +102,17 @@ class HydraDataPreprocessor:
         with open(filepath, 'w', encoding='utf-8') as f:
             json.dump(self.meta_data, f, indent=2, ensure_ascii=False)
 
+    def save(self, path: str):
+        Path(path).parent.mkdir(parents=True, exist_ok=True)
+        joblib.dump(self, path)
+        logger.info(f"Preprocessor saved to {path}")
+
+    @staticmethod
+    def load(path: str):
+        return joblib.load(path)
+
 
 class DiscreteProcessor:
-    """离散值处理器"""
-
     def __init__(self, feature_name: str, config: Dict):
         self.feature_name = feature_name
         self.config = config
@@ -107,12 +120,11 @@ class DiscreteProcessor:
         self.stats = {}
 
     def fit(self, data: pd.Series):
-        # 统计信息
         self.stats['null_count'] = data.isnull().sum()
         self.stats['null_ratio'] = self.stats['null_count'] / len(data)
         self.stats['unique_count'] = data.nunique()
 
-        # 构建编码映射 (从1开始，0留给空值和未知值)
+        # 0 for null/unknown
         valid_values = data.dropna().unique()
         self.value_to_idx = {value: idx + 1 for idx, value in enumerate(valid_values)}
         self.stats['vocab_size'] = len(valid_values) + 1  # +1 for null/unknown
@@ -120,9 +132,8 @@ class DiscreteProcessor:
     def transform(self, data: pd.Series) -> pd.Series:
         def map_value(x):
             if pd.isna(x):
-                return self.config.get('fillna_value', 0)
-            return self.value_to_idx.get(x, 0)  # 未知值映射为0
-
+                return self.config.get("fillna_value", 0)  # 0 for na
+            return self.value_to_idx.get(x, 0)  # 0 for unknown
         return data.map(map_value)
 
     def get_meta_data(self) -> Dict[str, Any]:
@@ -135,8 +146,6 @@ class DiscreteProcessor:
 
 
 class ContinuousProcessor:
-    """连续值处理器"""
-
     def __init__(self, feature_name: str, config: Dict):
         self.feature_name = feature_name
         self.config = config
@@ -144,7 +153,7 @@ class ContinuousProcessor:
         self.stats = {}
 
     def fit(self, data: pd.Series):
-        # 统计信息
+
         self.stats['null_count'] = data.isnull().sum()
         self.stats['null_ratio'] = self.stats['null_count'] / len(data)
         self.stats['zero_count'] = (data == 0).sum()
@@ -154,7 +163,7 @@ class ContinuousProcessor:
         self.stats['min'] = data.min()
         self.stats['max'] = data.max()
 
-        # 初始化标准化器
+        # Normalize
         scaler_type = self.config.get('scaler', 'standard')
         if scaler_type == 'standard':
             self.scaler = StandardScaler()
@@ -163,7 +172,6 @@ class ContinuousProcessor:
         elif scaler_type == 'robust':
             self.scaler = RobustScaler()
 
-        # 拟合标准化器（使用非空值）
         non_null_data = data.dropna().values.reshape(-1, 1)
         if len(non_null_data) > 0:
             self.scaler.fit(non_null_data)
@@ -177,7 +185,6 @@ class ContinuousProcessor:
             transformed_values = self.scaler.transform(values).flatten()
             transformed[non_null_mask] = transformed_values
 
-        # 处理空值
         if non_null_mask.any():
             fillna_strategy = self.config.get('fillna_strategy', 'mean')
             if fillna_strategy == 'mean':
@@ -185,12 +192,10 @@ class ContinuousProcessor:
             elif fillna_strategy == 'median':
                 fill_value = transformed[non_null_mask].median()
             elif fillna_strategy == 'zero':
-                fill_value = 0
+                fill_value = 0.0
             else:
-                fill_value = 0
-
+                fill_value = 0.0
             transformed[~non_null_mask] = fill_value
-
         return transformed
 
     def get_meta_data(self) -> Dict[str, Any]:
@@ -202,7 +207,6 @@ class ContinuousProcessor:
 
 
 class DiscreteSequenceProcessor:
-    """离散序列处理器"""
 
     def __init__(self, feature_name: str, config: Dict):
         self.feature_name = feature_name
@@ -215,7 +219,6 @@ class DiscreteSequenceProcessor:
         self.stats['null_count'] = data.isnull().sum()
         self.stats['null_ratio'] = self.stats['null_count'] / len(data)
 
-        # 收集所有序列中的唯一值
         all_values = set()
         sequence_lengths = []
 
@@ -229,7 +232,6 @@ class DiscreteSequenceProcessor:
         self.stats['avg_sequence_length'] = np.mean(sequence_lengths) if sequence_lengths else 0
         self.stats['max_sequence_length'] = max(sequence_lengths) if sequence_lengths else 0
 
-        # 构建编码映射
         self.value_to_idx = {value: idx + 1 for idx, value in enumerate(all_values)}
 
     def transform(self, data: pd.Series) -> List[List[int]]:
@@ -322,13 +324,11 @@ class ContinuousSequenceProcessor:
         }
 
 
-@hydra.main(version_base="1.3", config_path="../configs/preprocess", config_name="config")
+@hydra.main(version_base="1.3", config_path="../configs/preprocess", config_name="default")
 def main(cfg: DictConfig):
-    """主处理函数"""
     print("Loading configuration...")
     print(OmegaConf.to_yaml(cfg))
 
-    # 创建示例数据（在实际应用中，你会从文件加载）
     sample_data = {
         'user_id': [1, 2, 3, 4, 5],
         'age': [25, 30, 35, None, 40],
@@ -348,10 +348,7 @@ def main(cfg: DictConfig):
     print("Original data:")
     print(df)
 
-    # 初始化预处理器
     preprocessor = HydraDataPreprocessor(cfg)
-
-    # 执行预处理
     processed_data = preprocessor.fit_transform(df)
 
     print("\nProcessed tabular data:")
