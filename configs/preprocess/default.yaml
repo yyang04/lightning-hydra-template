@@ -1,32 +1,10 @@
-data:
-  data_dir: "./data"
-
-version: "v0"
-
-features:
-  discrete:
-    - "user_id"
-    - "category"
-    - "city"
-
-  continuous:
-    - "age"
-    - "price"
-    - "income"
-
-  discrete_sequence:
-    - "click_history"
-    - "search_history"
-
-  continuous_sequence: null
-
 processing:
   discrete:
     handle_unknown: "ignore"
     fillna_value: 0
 
   continuous:
-    scaler: "standard"  # standard, minmax, robust
+    scaler: "standard"       # standard, minmax, robust
     fillna_strategy: "mean"  # mean, median, zero
 
   discrete_sequence:
@@ -36,4 +14,3 @@ processing:
   continuous_sequence:
     max_sequence_length: 50
     padding_value: 0.
-

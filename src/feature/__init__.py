@@ -1,0 +1,4 @@
+from .CustomBinProcessor import CustomBinProcessor
+from .DiscreteProcessor import DiscreteProcessor
+from .KmeansBinProcessor import KMeansBinProcessor
+from .ContinuousProcessor import ContinuousProcessor

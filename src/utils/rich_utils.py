@@ -76,7 +76,7 @@ def print_config_tree(
 
 @rank_zero_only
 def enforce_tags(cfg: DictConfig, save_to_file: bool = False) -> None:
-    """Prompts user to input tags from command line if no tags are provided in config.
+    """Prompts user to input tags from the command line if no tags are provided in config.
 
     :param cfg: A DictConfig composed by Hydra.
     :param save_to_file: Whether to export tags to the hydra output folder. Default is ``False``.
@@ -84,7 +84,6 @@ def enforce_tags(cfg: DictConfig, save_to_file: bool = False) -> None:
     if not cfg.get("tags"):
         if "id" in HydraConfig().cfg.hydra.job:
             raise ValueError("Specify tags before launching a multirun!")
-
         log.warning("No tags provided in config. Prompting user to input tags...")
         tags = Prompt.ask("Enter a list of comma separated tags", default="dev")
         tags = [t.strip() for t in tags.split(",") if t != ""]

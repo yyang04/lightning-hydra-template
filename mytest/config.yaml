@@ -1,0 +1,18 @@
+department:
+  _target_: company.Department
+  name: "Engineering"
+  employees:
+    Alice:
+    - _target_: company.Employee
+      name: "Alice"
+      age: 30
+
+    Bob:
+    - _target_: company.Employee
+      name: "Bob"
+      age: 25
+
+    Charlie:
+    - _target_: company.Employee
+      name: "Charlie"
+      age: 35

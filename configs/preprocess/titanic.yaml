@@ -1,39 +1,75 @@
-data:
-  data_dir: "./data"
 
-version: "v0"
+dataset: titanic
+base_path: ../data
+
+input_path: ${base_path}/raw/${dataset}.csv
+output_path: ${base_path}/processed/${dataset}/${version}.parquet
+dump_path: ${base_path}/processed/${dataset}/${version}.yaml
+
+version: v0
 
 features:
-  discrete:
-    - "user_id"
-    - "category"
-    - "city"
+  - _target_: src.feature.DiscreteProcessor
+    feature: survived
+    source: survived
+  - _target_: src.feature.DiscreteProcessor
+    feature: pclass
+    source: pclass
+  - _target_: src.feature.DiscreteProcessor
+    feature: sex
+    source: sex
+  - _target_: src.feature.CustomBinProcessor
+    feature: age
+    source: age
+    bins: [20, 30, 40]
+  - _target_: src.feature.KMeansBinProcessor
+    feature: age_kmeans
+    source: age
+    n_bins: 5
 
-  continuous:
-    - "age"
-    - "price"
-    - "income"
+samples:
+  -
 
-  discrete_sequence:
-    - "click_history"
-    - "search_history"
-
-  continuous_sequence: null
-
-processing:
-  discrete:
-    handle_unknown: "ignore"
-    fillna_value: 0
-
-  continuous:
-    scaler: "standard"  # standard, minmax, robust
-    fillna_strategy: "mean"  # mean, median, zero
-
-  discrete_sequence:
-    max_sequence_length: 50
-    padding_value: 0
-
-  continuous_sequence:
-    max_sequence_length: 50
-    padding_value: 0.
+#
+#
+#
+#
+#
+#
+#
+#  discrete:
+#    - survived
+#    - pclass
+#    - sex
+#
+#  contin
+#  continuous:
+#    _target_:
+#    - "age"
+#    - "price"
+#    - "income"
+#
+#  discrete_sequence:
+#    _target_:
+#    - "click_history"
+#    - "search_history"
+#
+#  continuous_sequence: null
+#
+#processing:
+#  discrete:
+#    handle_unknown: "ignore"
+#    fillna_value: 0
+#
+#  continuous:
+#    scaler: "standard"  # standard, minmax, robust
+#    fillna_strategy: "mean"  # mean, median, zero
+#
+#  discrete_sequence:
+#    max_sequence_length: 50
+#    padding_value: 0
+#
+#  continuous_sequence:
+#    max_sequence_length: 50
+#    padding_value: 0.
 
