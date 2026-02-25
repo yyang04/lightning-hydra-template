@@ -2,9 +2,10 @@
 dataset: titanic
 base_path: ../data
 
-input_path: ${base_path}/raw/${dataset}.csv
-output_path: ${base_path}/processed/${dataset}/${version}.parquet
-dump_path: ${base_path}/processed/${dataset}/${version}.yaml
+input_path: ${base_path}/raw/${dataset}.parquet
+output_path: ${base_path}/processed/${dataset}/${version}/data.parquet
+dump_path: ${base_path}/processed/${dataset}/${version}/meta_data.yaml
+sample_dir: ${base_path}/processed/${dataset}/${version}/sample/
 
 version: v0
 
@@ -12,23 +13,103 @@ features:
   - _target_: src.feature.DiscreteProcessor
     feature: survived
     source: survived
+
   - _target_: src.feature.DiscreteProcessor
     feature: pclass
     source: pclass
+
   - _target_: src.feature.DiscreteProcessor
     feature: sex
     source: sex
+
   - _target_: src.feature.CustomBinProcessor
     feature: age
     source: age
     bins: [20, 30, 40]
+
   - _target_: src.feature.KMeansBinProcessor
     feature: age_kmeans
     source: age
     n_bins: 5
 
+  - _target_: src.feature.DiscreteProcessor
+    feature: sibsp
+    source: sibsp
+
+  - _target_: src.feature.DiscreteProcessor
+    feature: parch
+    source: parch
+
+  - _target_: src.feature.KMeansBinProcessor
+    feature: fare
+    source: fare
+    n_bins: 5
+
+  - _target_: src.feature.DiscreteProcessor
+    feature: embarked
+    source: embarked
+
+  - _target_: src.feature.DiscreteProcessor
+    feature: class
+    source: class
+
+  - _target_: src.feature.DiscreteProcessor
+    feature: who
+    source: who
+
+  - _target_: src.feature.DiscreteProcessor
+    feature: adult_male
+    source: adult_male
+
+  - _target_: src.feature.DiscreteProcessor
+    feature: deck
+    source: deck
+
+  - _target_: src.feature.DiscreteProcessor
+    feature: embark_town
+    source: embark_town
+
+  - _target_: src.feature.DiscreteProcessor
+    feature: alone
+    source: alone
+
+  - _target_: src.feature.DiscreteProcessor
+    feature: alive
+    source: alive
+    handle_unknown: false
+
+
 samples:
-  -
+  - _target_: src.feature.CategoricalFeature
+    group: cat_A  # 数据存储时设置文件名为 cat_A.npy
+    type: int16   # int16 - 32767  // int8 - 128
+    features: [survived,pclass,sex,age,age_kmeans,sibsp,parch,fare,embarked,class,who,adult_male,deck,embark_town,alone]  # 特征列
+
+  - _target_: src.feature.Label
+    type: int16
+    features: [alive]
+
+#  - _target_: src.feature.CategoricalFeature
+#    group: cat_B
+#    type: int16
+#    features: []
+#
+#  - _target_: src.feature.ContinuousFeature
+#    group: cont
+#    features: []
+#
+#  - _target_: src.feature.CategoricalSeqFeature
+#    group:
+#
+#  - _target_: src.feature.ContinuousSeqFeature
+#    group: cont_seq_A
+#    features: []
+#
+#  - _target_: src.feature.Label
+#    group:
+#
+#
+
 
 #
 #

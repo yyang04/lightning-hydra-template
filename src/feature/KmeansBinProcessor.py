@@ -35,8 +35,10 @@ class KMeansBinProcessor(BaseProcessor):
             indices = np.digitize(valid_data, self.bins, right=True) + 1
             unique, counts = np.unique(indices, return_counts=True)
             self.stats['bin_counts'] = dict(zip(unique.tolist(), counts.tolist()))
+            self.stats['vocab_size'] = len(unique)
         else:
             self.stats['bin_counts'] = {}
+            self.stats['vocab_size'] = 0
 
     def transform(self, data: pd.Series) -> np.ndarray:
         if self.bins is None or len(self.bins) == 0:

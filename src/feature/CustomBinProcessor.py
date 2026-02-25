@@ -20,8 +20,10 @@ class CustomBinProcessor(BaseProcessor):
             unique, counts = np.unique(indices, return_counts=True)
             bin_counts = dict(zip(unique.tolist(), counts.tolist()))
             self.stats['bin_counts'] = bin_counts
+            self.stats['vocab_size'] = len(unique)
         else:
             self.stats['bin_counts'] = {}
+            self.stats['vocab_size'] = 0
 
     def transform(self, data: pd.Series) -> np.ndarray:
         def _map(x):
