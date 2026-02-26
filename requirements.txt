@@ -26,7 +26,7 @@ pytest~=8.4.2
 
 pandas~=2.3.3
 numpy~=2.0.2
-scikit-learn~=1.6.1
+scikit-learn~=1.8.0
 omegaconf~=2.3.0
 joblib~=1.5.2
 seaborn~=0.13.2
