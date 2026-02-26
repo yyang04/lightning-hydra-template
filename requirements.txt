@@ -30,5 +30,5 @@ scikit-learn~=1.6.1
 omegaconf~=2.3.0
 joblib~=1.5.2
 seaborn~=0.13.2
-packaging~=25.0
+packaging~=26.0
 setuptools~=68.2.0
