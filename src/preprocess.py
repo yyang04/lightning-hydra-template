@@ -22,6 +22,7 @@ class DataPreprocessor:
         self.cfg = cfg
         self.processors: Dict[str, BaseProcessor] = {}
         self._initialize_processors()
+        self.processed_df = pd.DataFrame()
 
     def _initialize_processors(self):
         if hasattr(self.cfg, 'features'):
@@ -38,75 +39,30 @@ class DataPreprocessor:
             feature_name: processor.save()
             for feature_name, processor in self.processors.items()
         }
-        self.save(dump_dict)
+        self.save_meta(dump_dict)
 
-    def load(self):
+    def transform(self, df: pd.DataFrame):
+        for feature_name, processor in self.processors.items():
+            if processor.source in df.columns:
+                self.processed_df[feature_name] = processor.transform(df[processor.source])
+        return self.processed_df
+
+    def save_meta(self, dump_dict):
+        filepath = Path(self.cfg.dump_path)
+        filepath.parent.mkdir(parents=True, exist_ok=True)
+        OmegaConf.save(dump_dict, filepath)
+
+    def load_meta(self):
         dump_dict = OmegaConf.load(self.cfg.dump_path)
         for feature_name, processor in self.processors.items():
             if feature_name in dump_dict:
                 print(feature_name, dump_dict[feature_name])
                 processor.load(dump_dict[feature_name])
 
-    def save(self, dump_dict):
-        filepath = Path(self.cfg.dump_path)
-        filepath.parent.mkdir(parents=True, exist_ok=True)
-        OmegaConf.save(dump_dict, filepath)
-
-    def transform(self, df: pd.DataFrame):
-        processed_df = pd.DataFrame()
-        for feature_name, processor in self.processors.items():
-            if processor.source in df.columns:
-                print(feature_name)
-                processed_df[feature_name] = processor.transform(df[processor.source])
-        return processed_df
-
-        # continuous_list = []
-        # discrete_list = []
-        # sequence_data = {}
-        #
-        # for feature in self.cfg.features.continuous_features:
-        #     if feature in self.processors:
-        #         arr = self.processors[feature].transform(df[feature])
-        #         continuous_list.append(arr.reshape(-1, 1))
-        #
-        # for feature in self.cfg.features.discrete_features:
-        #     if feature in self.processors:
-        #         arr = self.processors[feature].transform(df[feature])
-        #         discrete_list.append(arr.reshape(-1, 1))
-        #
-        # for feature in [self.cfg.features.discrete_sequence_features, self.cfg.features.continuous_sequence_features]:
-        #     if feature in self.processors:
-        #         sequence_data[feature] = self.processors[feature].transform(df[feature])
-        #
-        # X_cont = np.hstack(continuous_list) if continuous_list else np.array([])
-        # X_cat = np.hstack(discrete_list) if discrete_list else np.array([])
-        #
-        # return {
-        #     'continuous_data': X_cont,
-        #     'categorical_data': X_cat,
-        #     'sequence_data': sequence_data,
-        #     'meta_data': self.meta_data
-        # }
-
-    def fit_transform(self, df: pd.DataFrame) -> Dict[str, Any]:
-        self.fit(df)
-        return self.transform(df)
-
-    def save_meta_data(self, filepath: str):
-        with open(filepath, 'w', encoding='utf-8') as f:
-            json.dump(self.meta_data, f, indent=2, ensure_ascii=False)
-
-    # def save(self, path: str):
-    #     Path(path).parent.mkdir(parents=True, exist_ok=True)
-    #     joblib.dump(self, path)
-    #     logger.info(f"Preprocessor saved to {path}")
-
-
-
-
-
-
-
+    def save(self):
+        if not self.processed_df.empty:
+            Path(self.cfg.output_path).parent.mkdir(parents=True, exist_ok=True)
+            self.processed_df.to_parquet(self.cfg.output_path)
 
 
 class DiscreteSequenceProcessor:
@@ -220,16 +176,12 @@ class ContinuousSequenceProcessor:
 
 @hydra.main(version_base="1.3", config_path="../configs/preprocess", config_name="titanic.yaml")
 def main(cfg: DictConfig):
-    print("Loading configuration...")
-    print(OmegaConf.to_yaml(cfg))
-
-    df = pd.read_csv(cfg.input_path)
+    df = pd.read_parquet(cfg.input_path)
     dataPreprocessor = DataPreprocessor(cfg)
     dataPreprocessor.fit(df)
+    dataPreprocessor.transform(df)
     # dataPreprocessor.load()
-    processed: DataFrame = dataPreprocessor.transform(df)
-    filepath = Path(cfg.output_path)
-    processed.to_parquet(filepath, index=False)
+    dataPreprocessor.save()
     return
 
     # sample_data = {

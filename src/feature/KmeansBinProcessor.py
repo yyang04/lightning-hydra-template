@@ -12,7 +12,6 @@ class KMeansBinProcessor(BaseProcessor):
         super().__init__(**kwargs)
         self.n_bins = int(n_bins)
         self.bins = None
-        self.stats = {}
 
     def fit(self, data: pd.Series):
         self.stats['null_count'] = data.isnull().sum().item()

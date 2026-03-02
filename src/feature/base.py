@@ -9,6 +9,7 @@ class BaseProcessor:
     def __init__(self, feature, source):
         self.feature = feature
         self.source = source
+        self.stats = {}
 
     @abstractmethod
     def fit(self, df: pd.Series):

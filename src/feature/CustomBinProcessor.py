@@ -9,7 +9,6 @@ class CustomBinProcessor(BaseProcessor):
     def __init__(self, bins, **kwargs):
         super().__init__(**kwargs)
         self.bins = np.asarray(bins).astype(float)
-        self.stats = {}
 
     def fit(self, data: pd.Series):
         self.stats['null_count'] = data.isnull().sum().item()

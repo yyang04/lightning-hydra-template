@@ -12,22 +12,24 @@ class CategoricalFeature:
         self.output_path = f"{group}.npy"
         self.dtype = dtype  # int16
 
-
     def save(self, df: DataFrame, dataProcessor: DataPreprocessor):
         final_df = pd.DataFrame()
         field_dims = []
+        field_names = []
         for feature in self.features:
             if feature in df.columns:
                 final_df[feature] = df[feature]
-                processor:  = dataProcessor.processors[feature]
+                processor = dataProcessor.processors[feature]
+                field_dims.append(processor.stats['vocab_size'])
+                field_names.append(processor.stats['feature_name'])
 
-
+        np.save(f"{self.group}.npy", final_df.value)
+        # save_meta
 
 
 
     def save_meta(self):
         pass
-
 
     def fit(self, data: pd.Series):
         self.stats['null_count'] = data.isnull().sum().item()
@@ -43,6 +45,7 @@ class CategoricalFeature:
             if pd.isna(x):
                 return 0
             return self.value_to_idx.get(x, 0)  # 0 for unknown
+
         return data.map(map_value).values.astype(np.int64)
 
     def save(self):
@@ -50,5 +53,7 @@ class CategoricalFeature:
         return
 
     def save(self, ):
+        pass
+
     def load(self, input_dict):
         self.value_to_idx = input_dict['value_to_idx']

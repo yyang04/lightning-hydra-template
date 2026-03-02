@@ -22,18 +22,17 @@ class ContinuousProcessor(BaseProcessor):
 
         self.impute_strategy = impute_strategy
         self.scale_strategy = scale_strategy
-        self.params = {}
 
     def fit(self, data: pd.Series):
 
         # 统计信息
-        self.params['min'] = float(data.min())
-        self.params['max'] = float(data.max())
-        self.params['range'] = self.params['max'] - self.params['min']
-        self.params['range'] = 1.0 if self.params['range'] == 0 else self.params['range']
-        self.params['mean'] = float(data.mean())
-        self.params['median'] = float(data.median())
-        self.params['std'] = 1 if float(data.std()) == 0 else float(data.std())
+        self.stats['min'] = float(data.min())
+        self.stats['max'] = float(data.max())
+        self.stats['range'] = self.stats['max'] - self.stats['min']
+        self.stats['range'] = 1.0 if self.stats['range'] == 0 else self.stats['range']
+        self.stats['mean'] = float(data.mean())
+        self.stats['median'] = float(data.median())
+        self.stats['std'] = 1 if float(data.std()) == 0 else float(data.std())
 
         if self.impute_strategy == 'mean':
             fill_val = float(data.mean())
@@ -41,16 +40,16 @@ class ContinuousProcessor(BaseProcessor):
             fill_val = float(data.median())
         else:
             fill_val = 0.0
-        self.params['fill_value'] = float(fill_val)
+        self.stats['fill_value'] = float(fill_val)
 
     def transform(self, data: pd.Series) -> np.ndarray:
 
-        filled_data = data.fillna(self.params['fill_value'])
+        filled_data = data.fillna(self.stats['fill_value'])
         X = filled_data.values.astype(float)
         if self.scale_strategy == 'minmax':
-            scaled_data = (X - self.params['min']) / self.params['range']
+            scaled_data = (X - self.stats['min']) / self.stats['range']
         elif self.scale_strategy == 'standard':
-            scaled_data = (X - self.params['mean']) / self.params['std']
+            scaled_data = (X - self.stats['mean']) / self.stats['std']
         else:
             scaled_data = X
         return scaled_data
@@ -59,10 +58,10 @@ class ContinuousProcessor(BaseProcessor):
         return {
             'impute_strategy': self.impute_strategy,
             'scale_strategy': self.scale_strategy,
-            'params': self.params
+            'stats': self.stats
         }
 
     def load(self, input_dict: dict):
         self.impute_strategy = input_dict['impute_strategy']
         self.scale_strategy = input_dict['scale_strategy']
-        self.params = input_dict['params']
+        self.stats = input_dict['stats']

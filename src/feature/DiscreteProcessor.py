@@ -9,7 +9,6 @@ class DiscreteProcessor(BaseProcessor):
         super().__init__(**kwargs)
         self.handle_unknown = handle_unknown
         self.value_to_idx = {}
-        self.stats = {}
 
     def fit(self, data: pd.Series):
         self.stats['null_count'] = data.isnull().sum().item()
