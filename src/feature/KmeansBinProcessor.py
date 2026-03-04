@@ -3,7 +3,7 @@ import pandas as pd
 
 from sklearn.cluster import KMeans
 
-from src.feature.base import BaseProcessor
+from src.feature.BaseProcessor import BaseProcessor
 
 
 class KMeansBinProcessor(BaseProcessor):

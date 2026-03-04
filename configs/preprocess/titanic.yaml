@@ -1,13 +1,11 @@
 
 dataset: titanic
 base_path: ../data
-
-input_path: ${base_path}/raw/${dataset}.parquet
-output_path: ${base_path}/processed/${dataset}/${version}/data.parquet
-dump_path: ${base_path}/processed/${dataset}/${version}/meta_data.yaml
-sample_dir: ${base_path}/processed/${dataset}/${version}/sample/
-
 version: v0
+
+input_path: ${base_path}/raw
+output_path: ${base_path}/processed/${dataset}/${version}
+sample_path: ${base_path}/processed/${dataset}/${version}/sample
 
 features:
   - _target_: src.feature.DiscreteProcessor

@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from src.feature.base import BaseProcessor
+from src.feature.BaseProcessor import BaseProcessor
 
 
 class CustomBinProcessor(BaseProcessor):
