@@ -3,7 +3,7 @@ dataset: titanic
 base_path: ../data
 version: v0
 
-input_path: ${base_path}/raw
+input_path: ${base_path}/raw/${dataset}.parquet
 output_path: ${base_path}/processed/${dataset}/${version}
 sample_path: ${base_path}/processed/${dataset}/${version}/sample
 
@@ -78,13 +78,14 @@ features:
 
 
 samples:
-  - _target_: src.feature.CategoricalFeature
+  - _target_: src.sample.DiscreteAggregator
     group: cat_A  # 数据存储时设置文件名为 cat_A.npy
-    type: int16   # int16 - 32767  // int8 - 128
+    dtype: int16   # int16 - 32767  // int8 - 128
     features: [survived,pclass,sex,age,age_kmeans,sibsp,parch,fare,embarked,class,who,adult_male,deck,embark_town,alone]  # 特征列
 
-  - _target_: src.feature.Label
-    type: int16
+  - _target_: src.sample.DiscreteAggregator
+    group: label
+    dtype: int16
     features: [alive]
 
 #  - _target_: src.feature.CategoricalFeature

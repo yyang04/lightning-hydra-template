@@ -21,7 +21,8 @@ class DataPreprocessor:
         self.aggregators: Dict[str, BaseAggregator] = {}
         self._initialize_processors()
         self.processed_df = pd.DataFrame()
-        self.df = pd.read_parquet(self.cfg.data.processed_path)
+        self.df = pd.read_parquet(self.cfg.input_path)
+        self._initiate_samples()
 
     def _initialize_processors(self):
         if hasattr(self.cfg, 'features'):
@@ -84,7 +85,7 @@ class DataPreprocessor:
             aggregator.save_samples(df=self.processed_df, path=self.cfg.sample_path)
 
         dump_dict = {
-            group: aggregator.save()
+            group: aggregator.save(self.processors)
             for group, aggregator in self.aggregators.items()
         }
         self.save_sample_meta(dump_dict)
@@ -99,8 +100,7 @@ class DataPreprocessor:
 def main(cfg: DictConfig):
     dataPreprocessor = DataPreprocessor(cfg)
     dataPreprocessor.fit_transform()
-    dataPreprocessor.transform()
-    dataPreprocessor.save()
+    dataPreprocessor.save_samples()
     return
 
 
