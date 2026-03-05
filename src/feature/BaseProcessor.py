@@ -1,9 +1,9 @@
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 
 import pandas as pd
 
 
-class BaseProcessor:
+class BaseProcessor(ABC):
 
     @abstractmethod
     def __init__(self, feature, source):

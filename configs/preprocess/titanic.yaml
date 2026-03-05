@@ -3,7 +3,8 @@ dataset: titanic
 base_path: ../data
 version: v0
 
-input_path: ${base_path}/raw/${dataset}.parquet
+input_file: ${base_path}/raw/${dataset}.parquet
+
 output_path: ${base_path}/processed/${dataset}/${version}
 sample_path: ${base_path}/processed/${dataset}/${version}/sample
 

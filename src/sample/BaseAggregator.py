@@ -17,6 +17,6 @@ class BaseAggregator:
         raise NotImplementedError
 
     @abstractmethod
-    def save(self, **kwargs):
+    def save(self, *args, **kwargs):
         raise NotImplementedError
 

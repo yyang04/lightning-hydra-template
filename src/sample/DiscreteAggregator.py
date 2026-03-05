@@ -19,9 +19,10 @@ class DiscreteAggregator(BaseAggregator):
             if feature in df.columns:
                 final_df[feature] = df[feature]
         final_df.astype(self.dtype)
-        filepath = Path(path) / f"{self.group}.npy"
-        filepath.parent.mkdir(parents=True, exist_ok=True)
-        np.save(filepath, final_df.values)
+        filepath_npy = Path(path) / f"{self.group}.npy"
+        filepath_parquet = Path(path) / f"{self.group}.parquet"
+        np.save(filepath_npy, final_df.values)
+        final_df.to_parquet(filepath_parquet)
 
     def save(self, processors):
         field_dims = []
