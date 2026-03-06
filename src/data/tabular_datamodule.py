@@ -5,6 +5,9 @@ import pandas as pd
 import numpy as np
 
 
+
+
+
 class HydraDataModule(LightningDataModule):
     def __init__(self,
                  df: pd.DataFrame,
@@ -111,8 +114,3 @@ class HydraDataModule(LightningDataModule):
             num_workers=self.num_workers,
             pin_memory=True
         )
-
-    def save_preprocessor(self, path):
-        """暴露一个方法用于保存训练好的 preprocessor"""
-        if self.preprocessor:
-            self.preprocessor.save(path)
