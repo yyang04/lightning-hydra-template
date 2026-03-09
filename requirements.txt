@@ -31,4 +31,4 @@ omegaconf~=2.3.0
 joblib~=1.5.2
 seaborn~=0.13.2
 packaging~=25.0
-setuptools~=68.2.0
+setuptools~=82.0.0
